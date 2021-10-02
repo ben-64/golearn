@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- JQUERY -->
+	<script src="js/jquery-3.6.0.min.js"></script>
+
+	<!-- Bootstrap  -->
+	<script src="js/bootstrap.bundle.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css"> 
+
+	<!-- Bootstrap input spinner -->
+	<script src="js/bootstrap-input-spinner.js"></script>
+
+	<!-- Golearn stuff -->
+	<script src="js/golearn.js"></script>
+	<script>$("input[type='number']").inputSpinner();</script>
+	<style>
+	#wordFile::before {
+		content: "   Choisir";
+       	position: absolute;
+        z-index: 2;
+        display: block;
+        background-color: #eee;
+        width: 90px;
+	}
+	</style>
+
+    <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">-->
+    <title>J'apprends les mots invariables</title>
+  </head>
+  <body {{if eq .State 1}}onload="say_word('{{.CurrentWord}}')"{{end}} >
+
+	<div class="container"><div class="row"><div class="col-8">
+	<h1>Mots invariables</h1>
+	
+	{{if eq .State 0}}
+		<form action="/" enctype='multipart/form-data' method="post">
+			<div class="mb-3">
+				<div class="form-group">
+					<label class="form-label" for="wordFile">Fichiers contenant les mots que je dois te dicter</label>
+					<input type="file" class="form-control" name="wordFile" id="wordFile" />
+			    	<label for="word" class="form-label">Combien de mots invariables veux-tu que je te demande ?</label>
+					<input type="number" value="3" min="1" max="10" step="1" name="nb_word" class="form-control"/>
+				</div>
+		  	</div>
+		  	<button type="submit" class="btn btn-success">Commencer</button>
+		</form>
+	{{else}}
+		{{if eq .State 1}}
+		<form action="/" method="post">
+			<div class="mb-3">
+		    	<label for="word" class="form-label">Mot à écrire</label>
+		    	<input type="text" class="form-control" id="word" name="word" aria-describedby="mot" autocomplete="off" autofocus>
+		  	</div>
+		  	<button type="submit" class="btn btn-success">Envoyer</button>
+			<button onclick="say_word('{{.CurrentWord}}')" type="button" class="btn btn-primary">Répéter Mot</button>
+		</form>
+		{{else}}
+			<p>Bravo tu as eu {{.Good}} bonnes réponses</p>
+			{{if .Errors}}
+			Tu as fait des erreurs sur <ul>{{range .Errors}}<li><span class="text-success">{{.Good}}</span> (Tu as écrit <span class="text-danger">{{.Bad}}</span>)</li> {{end}}</ul>
+			{{end}}
+			<form action="/" method="post">
+				<input type="hidden" name="restart" value="1"/>
+				<button type="submit" class="btn btn-primary">Recommencer</button>
+			</form>
+			<a href="/">
+				<button type="button" class="btn btn-primary" style="margin-top:5px">Recommencer avec des nouveaux mots</button>
+			</a>
+		{{end}}
+	{{end}}
+	</div></div></div>
+	
+  </body>
+</html>
