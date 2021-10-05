@@ -53,7 +53,7 @@
 		<form action="/" method="post">
 			<div class="mb-3">
 		    	<label for="word" class="form-label">Mot à écrire</label>
-		    	<input type="text" class="form-control" id="word" name="word" aria-describedby="mot" autocomplete="off" autofocus>
+		    	<input type="text" class="form-control" id="word" name="word" aria-describedby="mot" autocomplete="off" spellcheck="false" autofocus>
 		  	</div>
 		  	<button type="submit" class="btn btn-success">Envoyer</button>
 			<button onclick="say_word('{{.CurrentWord}}')" type="button" class="btn btn-primary">Répéter Mot</button>
