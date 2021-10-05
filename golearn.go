@@ -95,7 +95,7 @@ func getrequest(w http.ResponseWriter, r *http.Request) {
 				conf = Configuration{CurrentWord:"", NbWords:0, Errors:nil, Words:nil, AlreadyAskedWords:nil, State:1, Good:0}
 				val, err := strconv.ParseUint(r.FormValue("nb_word"),10,8)
 				if err != nil {
-					conf.NbWords = 3
+					conf.NbWords = 10
 				} else {
 					conf.NbWords = uint8(val)
 				}
