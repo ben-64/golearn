@@ -52,7 +52,7 @@
 		{{if eq .State 1}}
 		<form action="/" method="post">
 			<div class="mb-3">
-		    	<label for="word" class="form-label">Mot à écrire</label>
+                <label for="word" class="form-label">Mot à écrire (il en reste encore {{.Remaining}})</label>
 		    	<input type="text" class="form-control" id="word" name="word" aria-describedby="mot" autocomplete="off" spellcheck="false" autofocus>
 		  	</div>
 		  	<button type="submit" class="btn btn-success">Envoyer</button>
