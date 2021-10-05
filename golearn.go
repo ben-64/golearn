@@ -37,6 +37,9 @@ type Configuration struct {
 	// Good answser, usefull at the end
 	Good uint8
 
+    // Remaining try
+    Remaining uint8
+
 	// State of the exercice
 	State uint8
 }
@@ -85,20 +88,23 @@ func getrequest(w http.ResponseWriter, r *http.Request) {
 		// Check if it is a restart
 		_, need_restart := r.Form["restart"]
 		if need_restart && len(conf.Words) > 0 {
-			conf.AlreadyAskedWords = nil
-			conf.State = 1
-			conf.Errors = nil
+            conf.AlreadyAskedWords = nil
+            conf.State = 1
+            conf.Errors = nil
+            conf.Good = 0
+            conf.Remaining = conf.NbWords
 		} else {
 			file, _, has_word_file := r.FormFile("wordFile")
 			if has_word_file == nil {
 				// We have just receive the words list
-				conf = Configuration{CurrentWord:"", NbWords:0, Errors:nil, Words:nil, AlreadyAskedWords:nil, State:1, Good:0}
+                conf = Configuration{CurrentWord:"", NbWords:0, Errors:nil, Words:nil, AlreadyAskedWords:nil, State:1, Good:0, Remaining:0}
 				val, err := strconv.ParseUint(r.FormValue("nb_word"),10,8)
 				if err != nil {
 					conf.NbWords = 10
 				} else {
 					conf.NbWords = uint8(val)
 				}
+                conf.Remaining = conf.NbWords
 				scanner := bufio.NewScanner(file)
 				for scanner.Scan() {
 					conf.Words = append(conf.Words, scanner.Text())
@@ -106,6 +112,7 @@ func getrequest(w http.ResponseWriter, r *http.Request) {
 			} else {
 				word := r.FormValue("word")
 				if len(word) != 0 {
+                    conf.Remaining -= 1
 					if word != conf.CurrentWord {
 						// Mispelled word
 						var e Error = Error{Good: conf.CurrentWord, Bad: word}
@@ -114,7 +121,11 @@ func getrequest(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-		if uint8(len(conf.AlreadyAskedWords)) < conf.NbWords {
+		if conf.Remaining > 0 {
+            // If we have already used all words, we start again
+            if len(conf.Words) == len(conf.AlreadyAskedWords) {
+                conf.AlreadyAskedWords = nil
+            }
 			// Choose a random word, and extract it from the list to avoid asking the same word
 			var remaining_words = difference(conf.Words,conf.AlreadyAskedWords)
 			i := rand.Intn(len(remaining_words))
@@ -123,10 +134,10 @@ func getrequest(w http.ResponseWriter, r *http.Request) {
 		} else {
 			// End, display of results
 			conf.State = 2
-			conf.Good = conf.NbWords - uint8(len(conf.Errors))
+            conf.Good = conf.NbWords - uint8(len(conf.Errors))
 		}
 	} else {
-			conf.State = 0
+		conf.State = 0
 	}
 	log.Printf("conf: %+v", conf)
 	t, _ := template.ParseFiles("www/golearn.html")
