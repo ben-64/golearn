@@ -3,6 +3,7 @@ package main
 import (
     "log"
 	"strconv"
+    "strings"
 	"bufio"
 	"time"
     "net/http"
@@ -110,7 +111,7 @@ func getrequest(w http.ResponseWriter, r *http.Request) {
 					conf.Words = append(conf.Words, scanner.Text())
 				}
 			} else {
-				word := r.FormValue("word")
+				word := strings.TrimSpace(r.FormValue("word"))
 				if len(word) != 0 {
                     conf.Remaining -= 1
 					if word != conf.CurrentWord {
